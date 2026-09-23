@@ -1,0 +1,55 @@
+{
+  "source": "curated-fallback-cache",
+  "generatedAt": "2026-09-23T00:00:00+09:00",
+  "note": "프로토타입 거리 계산용 검증 캐시입니다. 공식 실시간 개방 정보가 아닙니다.",
+  "items": [
+    {
+      "id": "fallback-1",
+      "name": "은혜공원 남녀분리 공중화장실",
+      "shortName": "은혜공원 화장실",
+      "lat": 37.3942,
+      "lng": 126.9568,
+      "distance": 120,
+      "openHours": "24시간 개방(예시)",
+      "isOpen": true,
+      "stairs": false,
+      "ramp": true,
+      "handrail": true,
+      "emergencyBell": true,
+      "tel": "031-8045-2882",
+      "verified": false
+    },
+    {
+      "id": "fallback-2",
+      "name": "안양천 산책로 2호 쉼터 화장실",
+      "shortName": "안양천 쉼터 화장실",
+      "lat": 37.3955,
+      "lng": 126.9585,
+      "distance": 280,
+      "openHours": "06:00~22:00(예시)",
+      "isOpen": true,
+      "stairs": false,
+      "ramp": true,
+      "handrail": true,
+      "emergencyBell": true,
+      "tel": "031-8045-2883",
+      "verified": false
+    },
+    {
+      "id": "fallback-3",
+      "name": "중앙시장 고객쉼터 개방화장실",
+      "shortName": "중앙시장 쉼터 화장실",
+      "lat": 37.397,
+      "lng": 126.953,
+      "distance": 430,
+      "openHours": "09:00~20:00(예시)",
+      "isOpen": true,
+      "stairs": true,
+      "ramp": false,
+      "handrail": false,
+      "emergencyBell": false,
+      "tel": "031-8045-2885",
+      "verified": false
+    }
+  ]
+}
