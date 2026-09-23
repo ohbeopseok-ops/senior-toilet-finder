@@ -22,24 +22,49 @@ jobs:
         with:
           ref: main
 
+      - name: Check API configuration
+        id: config
+        env:
+          DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
+          DATA_GO_KR_ENDPOINT: ${{ vars.DATA_GO_KR_ENDPOINT }}
+        run: |
+          if [ -n "$DATA_GO_KR_SERVICE_KEY" ] && [ -n "$DATA_GO_KR_ENDPOINT" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+            echo "DATA.GO.KR API configuration ready"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "DATA.GO.KR endpoint or service key not configured; workflow will exit cleanly"
+          fi
+
       - name: Fetch official public-restroom API and inspect schema
+        if: steps.config.outputs.ready == 'true'
         env:
           DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
           DATA_GO_KR_ENDPOINT: ${{ vars.DATA_GO_KR_ENDPOINT }}
         run: python3 scripts/sync_data_go_kr.py
 
       - name: Compute current opening status
+        if: steps.config.outputs.ready == 'true'
         run: python3 scripts/compute_open_status.py
 
       - name: Commit normalized API cache and schema report
+        if: steps.config.outputs.ready == 'true'
         run: |
-          if git diff --quiet -- data/toilets-live.json data/schema-report.json; then
+          CHANGED=""
+          if ! git diff --quiet -- data/toilets-live.json; then
+            git add data/toilets-live.json
+            CHANGED="yes"
+          fi
+          if [ -f data/schema-report.json ] && ! git diff --quiet -- data/schema-report.json; then
+            git add data/schema-report.json
+            CHANGED="yes"
+          fi
+          if [ -z "$CHANGED" ]; then
             echo "No API data changes"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/toilets-live.json data/schema-report.json
           git commit -m "data: refresh data.go.kr public restroom cache"
           git pull --rebase origin main
           git push
