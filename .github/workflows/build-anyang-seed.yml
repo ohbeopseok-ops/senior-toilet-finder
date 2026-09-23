@@ -1,0 +1,36 @@
+name: Build Anyang Toilet Seed
+
+on:
+  push:
+    paths:
+      - "data/bootstrap/anyang.part1.b64"
+      - "data/bootstrap/anyang.part2.b64"
+      - "scripts/build_anyang_seed.py"
+      - ".github/workflows/build-anyang-seed.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout latest main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Build normalized Anyang dataset
+        run: python3 scripts/build_anyang_seed.py
+      - name: Commit generated dataset
+        run: |
+          if git diff --quiet -- data/anyang-toilets.json; then
+            echo "No Anyang dataset changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/anyang-toilets.json
+          git commit -m "data: add normalized Anyang public toilets"
+          git pull --rebase origin main
+          git push
