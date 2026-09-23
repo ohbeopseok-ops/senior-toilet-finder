@@ -37,8 +37,34 @@
     </div>
   </header>
 
-  <div class="bg-amber-300 text-black px-4 py-2 text-center text-xs font-black">
-    🧪 프로토타입입니다. 현재 화장실 정보·개방 여부·경로는 실시간 공공데이터가 아닙니다.
+  <div id="data-status-banner" class="bg-amber-300 text-black px-4 py-2 text-center text-xs font-black">
+    🔄 공공데이터 상태 확인 중...
+  </div>
+
+  <div id="setup-modal" class="hidden fixed inset-0 z-[100] bg-black/90 p-4 items-center justify-center">
+    <div class="w-full max-w-sm bg-cardDark border-4 border-safeYellow rounded-3xl p-5 shadow-2xl">
+      <div class="text-center mb-4">
+        <div class="text-5xl mb-2">👵📱</div>
+        <h2 class="text-2xl font-black text-white">처음 한 번만 준비할게요</h2>
+        <p class="text-gray-300 mt-1 text-sm">아래를 위에서부터 한 번씩 눌러주세요.</p>
+      </div>
+      <div class="space-y-3">
+        <button id="setup-location-btn" onclick="requestLocationPermission()" class="w-full py-4 rounded-2xl bg-safeYellow text-black text-lg font-black text-left px-4">1. 📍 위치 허용</button>
+        <button id="setup-orientation-btn" onclick="requestOrientationPermission()" class="w-full py-4 rounded-2xl bg-[#2a2a2a] border-2 border-gray-600 text-white text-lg font-black text-left px-4">2. 🧭 방향 센서 허용</button>
+        <button id="setup-install-btn" onclick="showInstallGuide()" class="w-full py-4 rounded-2xl bg-[#2a2a2a] border-2 border-gray-600 text-white text-lg font-black text-left px-4">3. ➕ 홈 화면에 추가</button>
+      </div>
+      <button onclick="finishSetup()" class="w-full mt-4 py-4 rounded-2xl border-2 border-safeGreen text-safeGreen font-black text-lg">준비 끝 · 화장실 찾기</button>
+      <p class="mt-3 text-xs text-gray-400 text-center">홈 화면 추가는 지금 건너뛰어도 검색은 사용할 수 있습니다.</p>
+    </div>
+  </div>
+
+  <div id="install-guide" class="hidden fixed inset-0 z-[110] bg-black/90 p-4 items-center justify-center">
+    <div class="w-full max-w-sm bg-white text-black rounded-3xl p-6 text-center">
+      <div class="text-5xl mb-3">⬆️</div>
+      <h2 class="text-2xl font-black">아이폰 홈 화면에 추가</h2>
+      <p class="mt-3 text-lg font-bold leading-relaxed">Safari 아래의 <b>공유</b> 버튼 → <b>홈 화면에 추가</b> → <b>추가</b>를 누르세요.</p>
+      <button onclick="document.getElementById('install-guide').classList.add('hidden');document.getElementById('install-guide').classList.remove('flex')" class="w-full mt-6 py-4 bg-black text-white rounded-2xl text-lg font-black">확인</button>
+    </div>
   </div>
 
   <main class="flex-1 p-4">
@@ -56,7 +82,7 @@
 
       <div>
         <div class="flex items-center justify-between mb-2">
-          <h2 class="font-bold">🔍 주변 안심 화장실 예시</h2>
+          <h2 class="font-bold">🔍 주변 안심 화장실</h2>
           <span id="gps-status-indicator" class="text-xs text-gray-400 font-bold">○ 위치 확인 중</span>
         </div>
         <div id="quick-toilet-list" class="space-y-3"></div>
@@ -65,7 +91,7 @@
 
     <section id="view-navigation" class="hidden flex flex-col gap-4">
       <div class="bg-cardDark border-2 border-safeYellow rounded-2xl p-4">
-        <div class="flex justify-between"><span class="bg-safeGreen text-black text-xs font-black px-2.5 py-1 rounded-md">🟢 예시 이용 가능</span><span id="nav-hours" class="text-xs text-gray-300 font-bold"></span></div>
+        <div class="flex justify-between"><span id="nav-source-badge" class="bg-safeGreen text-black text-xs font-black px-2.5 py-1 rounded-md">🟡 데이터 확인 중</span><span id="nav-hours" class="text-xs text-gray-300 font-bold"></span></div>
         <h2 id="nav-target-name" class="text-2xl font-black mt-2"></h2>
         <div id="nav-target-tags" class="flex flex-wrap gap-1.5 mt-2"></div>
       </div>
@@ -88,24 +114,82 @@
   </main>
 
   <footer class="bg-[#141414] border-t border-borderDark px-4 py-3 text-center text-xs text-gray-400">
-    Senior Toilet Finder · Prototype V0.1
+    Senior Toilet Finder · V0.2 · iPhone setup + public-data fallback
   </footer>
 
 <script>
-const restroomList=[
- {id:1,name:"은혜공원 남녀분리 공중화장실",shortName:"은혜공원 화장실",lat:37.3942,lng:126.9568,distance:120,openHours:"24시간 개방(예시)",isOpen:true,stairs:false,ramp:true,handrail:true,emergencyBell:true,tel:"031-8045-2882"},
- {id:2,name:"안양천 산책로 2호 쉼터 화장실",shortName:"안양천 쉼터 화장실",lat:37.3955,lng:126.9585,distance:280,openHours:"06:00~22:00(예시)",isOpen:true,stairs:false,ramp:true,handrail:true,emergencyBell:true,tel:"031-8045-2883"},
- {id:3,name:"중앙시장 고객쉼터 개방화장실",shortName:"중앙시장 쉼터 화장실",lat:37.3970,lng:126.9530,distance:430,openHours:"09:00~20:00(예시)",isOpen:true,stairs:true,ramp:false,handrail:false,emergencyBell:false,tel:"031-8045-2885"}
-];
-let voiceEnabled=true,largeFontMode=false,currentNavTarget=null,remainingDistance=0,userLocation={lat:37.3938,lng:126.9560};
+let restroomList=[];
+let dataSourceMode="loading";
+let voiceEnabled=true,largeFontMode=false,currentNavTarget=null,remainingDistance=0;
+let userLocation={lat:37.3938,lng:126.9560};
+let deferredPrompt=null;
+let orientationListenerBound=false;
+let guidanceStartTs=0;
 
-document.addEventListener("DOMContentLoaded",()=>{
-  initGeolocation(); renderQuickList();
+const isIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+const isStandalone=()=>window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone===true;
+
+document.addEventListener("DOMContentLoaded",async()=>{
   if("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(()=>{});
-  setupDeviceOrientation();
+  window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;});
+  await loadRestroomData();
+  if(isIOS()&&!isStandalone()&&!localStorage.getItem("seniorToiletSetupDone")){
+    const modal=document.getElementById("setup-modal"); modal.classList.remove("hidden"); modal.classList.add("flex");
+  }else{
+    initGeolocation();
+    setupDeviceOrientation();
+  }
 });
 
-function initGeolocation(){
+async function loadJson(url){
+  const r=await fetch(url,{cache:"no-store"});
+  if(!r.ok) throw new Error(url+" "+r.status);
+  return r.json();
+}
+
+async function loadRestroomData(){
+  const banner=document.getElementById("data-status-banner");
+  try{
+    const live=await loadJson("./data/toilets-live.json");
+    const usable=(live.items||[]).filter(x=>Number.isFinite(Number(x.lat))&&Number.isFinite(Number(x.lng)));
+    if(usable.length){
+      restroomList=usable.map(normalizeRestroom);
+      dataSourceMode="official-live";
+      banner.textContent="🟢 공공데이터 동기화본 사용 중 · 위치좌표가 있는 시설만 표시";
+      banner.className="bg-green-300 text-black px-4 py-2 text-center text-xs font-black";
+    }else{
+      throw new Error("official dataset has no usable coordinates");
+    }
+  }catch(e){
+    const fallback=await loadJson("./data/toilets-fallback.json");
+    restroomList=(fallback.items||[]).map(normalizeRestroom);
+    dataSourceMode="fallback";
+    banner.textContent="🟡 공식 공공데이터의 좌표 제공 중단으로 검증용 위치 캐시를 사용 중입니다";
+    banner.className="bg-amber-300 text-black px-4 py-2 text-center text-xs font-black";
+  }
+  renderQuickList();
+}
+
+function normalizeRestroom(r,i){
+  return {
+    id:r.id??("restroom-"+i),
+    name:r.name||r.shortName||"공중화장실",
+    shortName:r.shortName||r.name||"공중화장실",
+    lat:Number(r.lat),lng:Number(r.lng),
+    distance:Number(r.distance||0),
+    openHours:r.openHours||"개방시간 확인 필요",
+    isOpen:r.isOpen!==false,
+    stairs:Boolean(r.stairs),ramp:Boolean(r.ramp),handrail:Boolean(r.handrail),
+    emergencyBell:Boolean(r.emergencyBell),tel:r.tel||"",
+    verified:Boolean(r.verified)
+  };
+}
+
+function requestLocationPermission(){
+  initGeolocation(true);
+}
+
+function initGeolocation(fromSetup=false){
  const loc=document.getElementById("current-location-text"),status=document.getElementById("gps-status-indicator");
  if(!("geolocation" in navigator)){loc.textContent="📍 이 기기에서는 위치 기능을 사용할 수 없습니다";return;}
  navigator.geolocation.getCurrentPosition(p=>{
@@ -113,47 +197,105 @@ function initGeolocation(){
    loc.textContent="📍 현재 위치: GPS 수신 중";
    status.textContent="● GPS 연결"; status.className="text-xs text-safeGreen font-bold";
    recalcDistances();renderQuickList();
+   const b=document.getElementById("setup-location-btn");
+   if(b){b.textContent="1. ✅ 위치 허용 완료";b.className="w-full py-4 rounded-2xl bg-safeGreen text-black text-lg font-black text-left px-4";}
  },()=>{
-   loc.textContent="📍 위치 권한이 없어 예시 위치를 사용합니다";
-   status.textContent="○ 예시 위치";
- },{enableHighAccuracy:true,timeout:8000});
+   loc.textContent="📍 위치 권한이 필요합니다";
+   status.textContent="○ 위치 권한 필요";
+   if(fromSetup) alert("아이폰 설정에서 Safari의 위치 접근을 허용한 뒤 다시 눌러주세요.");
+ },{enableHighAccuracy:true,timeout:8000,maximumAge:15000});
 }
+
+async function requestOrientationPermission(){
+  try{
+    if(typeof DeviceOrientationEvent!=="undefined" && typeof DeviceOrientationEvent.requestPermission==="function"){
+      const result=await DeviceOrientationEvent.requestPermission();
+      if(result!=="granted") throw new Error("not granted");
+    }
+    setupDeviceOrientation();
+    const b=document.getElementById("setup-orientation-btn");
+    if(b){b.textContent="2. ✅ 방향 센서 허용 완료";b.className="w-full py-4 rounded-2xl bg-safeGreen text-black text-lg font-black text-left px-4";}
+  }catch(e){
+    alert("방향 센서가 허용되지 않았습니다. 설정에서 Safari의 동작 및 방향 접근을 확인해주세요.");
+  }
+}
+
+function showInstallGuide(){
+  if(!isIOS()&&deferredPrompt){
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.finally(()=>{deferredPrompt=null;});
+    return;
+  }
+  const g=document.getElementById("install-guide");g.classList.remove("hidden");g.classList.add("flex");
+}
+
+function finishSetup(){
+  localStorage.setItem("seniorToiletSetupDone","1");
+  const m=document.getElementById("setup-modal");m.classList.add("hidden");m.classList.remove("flex");
+}
+
 function calculateDistance(a,b,c,d){const R=6371e3,p1=a*Math.PI/180,p2=c*Math.PI/180,dp=(c-a)*Math.PI/180,dl=(d-b)*Math.PI/180;const x=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
 function recalcDistances(){restroomList.forEach(r=>r.distance=Math.round(calculateDistance(userLocation.lat,userLocation.lng,r.lat,r.lng)));restroomList.sort((a,b)=>a.distance-b.distance)}
+
 function renderQuickList(){
  const el=document.getElementById("quick-toilet-list"); el.innerHTML="";
- restroomList.forEach(r=>{
+ if(!restroomList.length){el.innerHTML='<div class="p-4 text-center text-gray-300">화장실 데이터를 준비 중입니다.</div>';return;}
+ restroomList.slice(0,10).forEach(r=>{
    const min=Math.max(1,Math.ceil(r.distance/50)),card=document.createElement("button");
    card.className="w-full text-left bg-cardDark border-2 border-borderDark rounded-2xl p-4 flex justify-between items-center active:scale-[.99]";
    card.onclick=()=>startSpecificNavigation(r.id);
-   card.innerHTML=`<div class="pr-2"><div class="flex gap-1.5 mb-1"><span class="text-xs px-2 py-0.5 rounded font-black ${r.stairs?'bg-gray-700 text-gray-300':'bg-green-950 text-safeGreen border border-safeGreen'}">${r.stairs?'계단 있음':'🚫 계단 없음'}</span></div><h3 class="text-lg font-black">${r.shortName}</h3><p class="text-xs text-gray-400 mt-1">${r.openHours}</p></div><div class="text-right"><div class="text-2xl font-black text-safeYellow">${r.distance}m</div><div class="text-xs text-gray-300">약 ${min}분</div><span class="inline-block mt-1 bg-yellow-400 text-black text-xs font-black px-2 py-1 rounded-lg">안내 ›</span></div>`;
+   const verify=r.verified?'<span class="text-xs text-safeGreen font-black">공식 데이터</span>':'<span class="text-xs text-amber-300 font-black">검증 캐시</span>';
+   card.innerHTML=`<div class="pr-2"><div class="flex flex-wrap gap-1.5 mb-1"><span class="text-xs px-2 py-0.5 rounded font-black ${r.stairs?'bg-gray-700 text-gray-300':'bg-green-950 text-safeGreen border border-safeGreen'}">${r.stairs?'계단 있음':'🚫 계단 없음'}</span>${verify}</div><h3 class="text-lg font-black">${r.shortName}</h3><p class="text-xs text-gray-400 mt-1">${r.openHours}</p></div><div class="text-right"><div class="text-2xl font-black text-safeYellow">${r.distance}m</div><div class="text-xs text-gray-300">약 ${min}분</div><span class="inline-block mt-1 bg-yellow-400 text-black text-xs font-black px-2 py-1 rounded-lg">안내 ›</span></div>`;
    el.appendChild(card);
  });
 }
-function startEmergencySearch(){startNavigationWith(restroomList.find(r=>!r.stairs&&r.isOpen)||restroomList[0])}
-function startSpecificNavigation(id){const r=restroomList.find(x=>x.id===id);if(r)startNavigationWith(r)}
+
+function startEmergencySearch(){
+  guidanceStartTs=performance.now();
+  if(!restroomList.length){speak("화장실 데이터를 불러오는 중입니다. 잠시 후 다시 눌러주세요.");return;}
+  const target=restroomList.find(r=>!r.stairs&&r.isOpen)||restroomList[0];
+  startNavigationWith(target);
+}
+function startSpecificNavigation(id){guidanceStartTs=performance.now();const r=restroomList.find(x=>x.id===id);if(r)startNavigationWith(r)}
+
 function startNavigationWith(r){
  currentNavTarget=r;remainingDistance=r.distance;
  document.getElementById("view-home").classList.add("hidden");document.getElementById("view-navigation").classList.remove("hidden");
- document.getElementById("nav-target-name").textContent=r.name;document.getElementById("nav-hours").textContent=r.openHours;document.getElementById("nav-call-link").href="tel:"+r.tel;
+ document.getElementById("nav-target-name").textContent=r.name;document.getElementById("nav-hours").textContent=r.openHours;
+ const call=document.getElementById("nav-call-link");call.href=r.tel?"tel:"+r.tel:"#";call.setAttribute("aria-disabled",r.tel?"false":"true");
+ const badge=document.getElementById("nav-source-badge");
+ badge.textContent=r.verified?"🟢 공식 데이터":"🟡 검증 캐시";badge.className=r.verified?"bg-safeGreen text-black text-xs font-black px-2.5 py-1 rounded-md":"bg-amber-300 text-black text-xs font-black px-2.5 py-1 rounded-md";
  document.getElementById("nav-target-tags").innerHTML=`<span class="bg-yellow-950 border border-safeYellow text-safeYellow text-xs font-bold px-2 py-0.5 rounded">${r.stairs?'계단 주의':'🚫 계단 없음'}</span><span class="bg-gray-800 text-gray-200 text-xs font-bold px-2 py-0.5 rounded">${r.ramp?'경사로 있음':'경사로 미확인'}</span>`;
- updateNavDisplay();speak(`안내를 시작합니다. 전방 ${r.distance}미터, ${r.shortName}입니다. 현재는 프로토타입 안내입니다.`);
+ updateNavDisplay();
+ const elapsed=Math.round(performance.now()-guidanceStartTs);
+ localStorage.setItem("lastGuidanceStartMs",String(elapsed));
+ speak(`안내를 시작합니다. 전방 ${r.distance}미터, ${r.shortName}입니다.`);
 }
+
 function updateNavDisplay(){
  const m=Math.max(1,Math.ceil(remainingDistance/50));
  document.getElementById("nav-distance-text").innerHTML=remainingDistance+'<span class="text-2xl text-white ml-1">m</span>';
  document.getElementById("nav-time-text").innerHTML='어르신 걸음으로 <span class="text-safeGreen font-black">약 '+m+'분</span>';
  const arrow=document.getElementById("compass-arrow"),msg=document.getElementById("nav-guidance-instruction");
- if(remainingDistance>80){arrow.style.transform="rotate(0deg)";msg.textContent="🚶 계단 없는 길을 우선하는 예시 안내입니다"}
- else if(remainingDistance>30){arrow.style.transform="rotate(25deg)";msg.textContent="↗️ 약 50m 앞 오른쪽 방향 예시"}
+ if(remainingDistance>80){arrow.style.transform="rotate(0deg)";msg.textContent="🚶 화면 방향과 현장 표지를 함께 확인하세요"}
+ else if(remainingDistance>30){arrow.style.transform="rotate(25deg)";msg.textContent="↗️ 목적지 방향을 확인하며 이동하세요"}
  else{arrow.style.transform="rotate(0deg)";msg.textContent="🚾 곧 목적지입니다"}
 }
 function simulateWalkStep(){if(remainingDistance<=0)return;remainingDistance=Math.max(0,remainingDistance-35);updateNavDisplay();if(remainingDistance===0)speak("목적지에 도착했습니다. 실제 이용 전 현장 표지와 개방 여부를 확인해주세요.")}
-function stopNavigation(){speechSynthesis?.cancel();document.getElementById("view-navigation").classList.add("hidden");document.getElementById("view-home").classList.remove("hidden");currentNavTarget=null}
+function stopNavigation(){if(window.speechSynthesis)window.speechSynthesis.cancel();document.getElementById("view-navigation").classList.add("hidden");document.getElementById("view-home").classList.remove("hidden");currentNavTarget=null}
 function speak(t){if(!voiceEnabled||!("speechSynthesis" in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="ko-KR";u.rate=.88;window.speechSynthesis.speak(u)}
-function toggleVoice(){voiceEnabled=!voiceEnabled;document.getElementById("tts-icon").textContent=voiceEnabled?"🔊":"🔇";if(voiceEnabled)speak("음성 안내가 켜졌습니다.");else speechSynthesis?.cancel()}
+function toggleVoice(){voiceEnabled=!voiceEnabled;document.getElementById("tts-icon").textContent=voiceEnabled?"🔊":"🔇";if(voiceEnabled)speak("음성 안내가 켜졌습니다.");else if(window.speechSynthesis)window.speechSynthesis.cancel()}
 function toggleFontSize(){largeFontMode=!largeFontMode;document.body.classList.toggle("text-scale-large",largeFontMode);document.getElementById("btn-font-toggle").textContent=largeFontMode?"가-":"가+"}
-function setupDeviceOrientation(){if(window.DeviceOrientationEvent)window.addEventListener("deviceorientation",e=>{if(e.alpha!==null&&currentNavTarget&&remainingDistance>40){document.getElementById("compass-arrow").style.transform=`rotate(${Math.round(e.alpha%360)}deg)`}})}
+
+function setupDeviceOrientation(){
+  if(orientationListenerBound||!window.DeviceOrientationEvent)return;
+  orientationListenerBound=true;
+  window.addEventListener("deviceorientation",e=>{
+    if(e.alpha!==null&&currentNavTarget&&remainingDistance>40){
+      document.getElementById("compass-arrow").style.transform=`rotate(${Math.round(e.alpha%360)}deg)`;
+    }
+  });
+}
 </script>
 </body>
 </html>
