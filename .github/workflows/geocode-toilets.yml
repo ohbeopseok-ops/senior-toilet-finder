@@ -1,0 +1,51 @@
+name: Geocode Public Toilet Addresses
+
+on:
+  schedule:
+    - cron: "40 20 * * *"
+  workflow_dispatch:
+  push:
+    paths:
+      - "scripts/geocode_toilets.py"
+      - ".github/workflows/geocode-toilets.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  geocode:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout latest main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install coordinate converter
+        run: pip install pyproj
+
+      - name: Geocode Goyang and Suwon restroom addresses
+        env:
+          JUSO_SEARCH_KEY: ${{ secrets.JUSO_SEARCH_KEY }}
+          JUSO_COORD_KEY: ${{ secrets.JUSO_COORD_KEY }}
+          GEOCODE_REGIONS: "고양시,수원시"
+          GEOCODE_MAX: "100"
+        run: python3 scripts/geocode_toilets.py
+
+      - name: Commit enriched coordinates
+        run: |
+          if git diff --quiet -- data/toilets-live.json; then
+            echo "No coordinate changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/toilets-live.json
+          git commit -m "data: geocode public toilet addresses"
+          git pull --rebase origin main
+          git push
