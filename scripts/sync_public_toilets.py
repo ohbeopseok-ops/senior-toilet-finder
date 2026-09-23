@@ -143,6 +143,9 @@ def main() -> int:
                     "address": pick(row, ROAD_KEYS) or pick(row, LOT_KEYS),
                     "agency": pick(row, AGENCY_KEYS),
                     "verified": True,
+                    "openStatusVerified": bool(pick(row, OPEN_KEYS)),
+                    "stairsVerified": False,
+                    "sourceRegion": pick(row, ["시군명", "시군", "지역명"]),
                 }
             )
 
