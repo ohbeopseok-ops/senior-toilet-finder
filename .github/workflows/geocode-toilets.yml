@@ -29,23 +29,35 @@ jobs:
       - name: Install coordinate converter
         run: pip install pyproj
 
-      - name: Geocode Goyang and Suwon restroom addresses
+      - name: Prepare Anyang live dataset
+        run: python3 scripts/prepare_anyang_live.py
+
+      - name: Geocode all Anyang restroom addresses
         env:
           JUSO_SEARCH_KEY: ${{ secrets.JUSO_SEARCH_KEY }}
           JUSO_COORD_KEY: ${{ secrets.JUSO_COORD_KEY }}
           GEOCODE_REGIONS: "안양시"
-          GEOCODE_MAX: "100"
+          GEOCODE_MAX: "249"
         run: python3 scripts/geocode_toilets.py
 
-      - name: Commit enriched coordinates
+      - name: Compute current opening status
+        run: python3 scripts/compute_open_status.py
+
+      - name: Build district success and failure report
+        run: python3 scripts/report_anyang_geocode.py
+
+      - name: Promote live Anyang data and retire prototype fallback when ready
+        run: python3 scripts/promote_anyang_live.py
+
+      - name: Commit enriched coordinates and reports
         run: |
-          if git diff --quiet -- data/toilets-live.json; then
-            echo "No coordinate changes"
+          git add data/toilets-live.json data/toilets-fallback.json data/anyang-geocode-report.json docs/ANYANG_GEOCODE_REPORT.md
+          if git diff --cached --quiet; then
+            echo "No coordinate/report changes"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/toilets-live.json
-          git commit -m "data: geocode public toilet addresses"
+          git commit -m "data: geocode Anyang toilets and refresh report"
           git pull --rebase origin main
           git push
