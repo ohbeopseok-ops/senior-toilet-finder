@@ -38,8 +38,7 @@ Settings → Secrets and variables → Actions → Repository secrets
 
 자동 배치는 우선 다음 지역만 처리합니다.
 
-- 고양시
-- 수원시
+- 안양시
 
 `GEOCODE_REGIONS` 값을 변경하면 경기도 전체로 확대할 수 있습니다.
 
