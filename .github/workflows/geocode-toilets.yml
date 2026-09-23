@@ -33,7 +33,7 @@ jobs:
         env:
           JUSO_SEARCH_KEY: ${{ secrets.JUSO_SEARCH_KEY }}
           JUSO_COORD_KEY: ${{ secrets.JUSO_COORD_KEY }}
-          GEOCODE_REGIONS: "고양시,수원시"
+          GEOCODE_REGIONS: "안양시"
           GEOCODE_MAX: "100"
         run: python3 scripts/geocode_toilets.py
 
