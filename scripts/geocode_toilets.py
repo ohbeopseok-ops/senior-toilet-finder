@@ -40,7 +40,7 @@ from pyproj import Transformer
 SRC = Path("data/toilets-live.json")
 SEARCH_KEY = os.getenv("JUSO_SEARCH_KEY", "").strip()
 COORD_KEY = os.getenv("JUSO_COORD_KEY", "").strip()
-REGIONS = [x.strip() for x in os.getenv("GEOCODE_REGIONS", "고양시,수원시").split(",") if x.strip()]
+REGIONS = [x.strip() for x in os.getenv("GEOCODE_REGIONS", "안양시").split(",") if x.strip()]
 MAX_ROWS = int(os.getenv("GEOCODE_MAX", "100"))
 
 SEARCH_URL = "https://business.juso.go.kr/addrlink/addrLinkApi.do"
