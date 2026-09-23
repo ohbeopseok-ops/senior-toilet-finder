@@ -17,7 +17,9 @@
       "handrail": true,
       "emergencyBell": true,
       "tel": "031-8045-2882",
-      "verified": false
+      "verified": false,
+      "openStatusVerified": false,
+      "stairsVerified": false
     },
     {
       "id": "fallback-2",
@@ -33,7 +35,9 @@
       "handrail": true,
       "emergencyBell": true,
       "tel": "031-8045-2883",
-      "verified": false
+      "verified": false,
+      "openStatusVerified": false,
+      "stairsVerified": false
     },
     {
       "id": "fallback-3",
@@ -49,7 +53,9 @@
       "handrail": false,
       "emergencyBell": false,
       "tel": "031-8045-2885",
-      "verified": false
+      "verified": false,
+      "openStatusVerified": false,
+      "stairsVerified": false
     }
   ]
 }
