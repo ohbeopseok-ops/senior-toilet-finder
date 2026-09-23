@@ -41,7 +41,7 @@ SRC = Path("data/toilets-live.json")
 SEARCH_KEY = os.getenv("JUSO_SEARCH_KEY", "").strip()
 COORD_KEY = os.getenv("JUSO_COORD_KEY", "").strip()
 REGIONS = [x.strip() for x in os.getenv("GEOCODE_REGIONS", "안양시").split(",") if x.strip()]
-MAX_ROWS = int(os.getenv("GEOCODE_MAX", "100"))
+MAX_ROWS = int(os.getenv("GEOCODE_MAX", "249"))
 
 SEARCH_URL = "https://business.juso.go.kr/addrlink/addrLinkApi.do"
 COORD_URL = "https://business.juso.go.kr/addrlink/addrCoordApi.do"
@@ -136,19 +136,29 @@ def main() -> int:
             break
         if item.get("lat") not in (None, "") and item.get("lng") not in (None, ""):
             continue
-        address = (item.get("address") or "").strip()
-        if not address or not in_scope(item):
+        primary = (item.get("roadAddress") or item.get("address") or "").strip()
+        fallback = (item.get("lotAddress") or "").strip()
+        if not primary or not in_scope(item):
             continue
 
         attempted += 1
+        item.pop("geocodeError", None)
         try:
-            road = find_road_address(address)
+            road = find_road_address(primary)
+            used = primary
+            method = "road-or-primary"
+            if not road and fallback and fallback != primary:
+                road = find_road_address(fallback)
+                used = fallback
+                method = "lot-fallback"
             if not road:
                 item["geocodeStatus"] = "address-not-found"
+                item["geocodeInput"] = used
                 continue
             coord = find_coordinates(road)
             if not coord:
                 item["geocodeStatus"] = "coordinate-not-provided"
+                item["geocodeInput"] = used
                 continue
 
             lat, lng = coord
@@ -156,8 +166,16 @@ def main() -> int:
             item["lng"] = round(lng, 7)
             item["geocodeStatus"] = "official-juso-coordinate"
             item["geocodeProvider"] = "MOIS-Juso"
+            item["geocodeInput"] = used
+            item["geocodeMethod"] = method
             item["geocodeRoadAddr"] = road.get("roadAddr", "")
             item["geocodeAdmCd"] = road.get("admCd", "")
+            item["geocodeDistrict"] = road.get("sggNm", "")
+            if item.get("district") == "구 미분류" and road.get("sggNm"):
+                if "동안구" in road.get("sggNm", ""):
+                    item["district"] = "동안구"
+                elif "만안구" in road.get("sggNm", ""):
+                    item["district"] = "만안구"
             changed += 1
         except Exception as exc:
             item["geocodeStatus"] = "error"
@@ -166,11 +184,14 @@ def main() -> int:
         # Coordinate API limit is 10 calls / 5 seconds. Keep a conservative pace.
         time.sleep(0.6)
 
+    success = sum(1 for item in items if item.get("lat") not in (None, "") and item.get("lng") not in (None, ""))
     payload["geocode"] = {
         "provider": "MOIS-Juso",
         "regions": REGIONS,
         "attempted": attempted,
         "updated": changed,
+        "success": success,
+        "successRate": round(success * 100 / len(items), 1) if items else 0,
     }
     SRC.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"geocoding attempted={attempted}, updated={changed}")
