@@ -1,0 +1,296 @@
+{
+  "generatedAt": "2026-09-23T09:46:27.205790+00:00",
+  "total": 249,
+  "success": 0,
+  "successRate": 0.0,
+  "districts": {
+    "구 미분류": {
+      "total": 3,
+      "success": 0,
+      "successRate": 0.0,
+      "statusCounts": {
+        "pending": 3
+      },
+      "failures": [
+        {
+          "name": "박석교 공중화장실",
+          "address": "경기도 안양시 박달동 10-1",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "희성어린이공원화장실",
+          "address": "경기도 안양시 달안동 1101-3",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "연현마을 공중화장실",
+          "address": "경기도 안양시 석수동 461-2",
+          "status": "pending",
+          "error": ""
+        }
+      ]
+    },
+    "동안구": {
+      "total": 141,
+      "success": 0,
+      "successRate": 0.0,
+      "statusCounts": {
+        "pending": 141
+      },
+      "failures": [
+        {
+          "name": "비산2동 행정복지센터 화장실",
+          "address": "경기도 안양시 동안구 관악대로106번길 70, 비산2동 행정복지센터 (비산동)",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "안양종합운동장 주경기장 입구",
+          "address": "경기도 안양시 동안구 평촌대로 389",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "평촌동 행정복지센터 화장실",
+          "address": "경기도 안양시 동안구 흥안대로456번길 21",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "중앙공원 관리사무실 공중화장실",
+          "address": "경기도 안양시 동안구 관평로 149",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "관양시장 공중화장실",
+          "address": "경기도 안양시 동안구 관평로336번길 31 (관양동)",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "평화공원 공중화장실",
+          "address": "경기도 안양시 동안구 비산동 1104-2",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "범계동 행정복지센터 화장실",
+          "address": "경기도 안양시 동안구 평촌대로217번길 63",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "비산3동 행정복지센터공중화장실",
+          "address": "경기도 안양시 동안구 운곡로 34 (비산동, 비산3동 행정복지센터)",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "안양시청 공중화장실",
+          "address": "경기도 안양시 동안구 시민대로 235",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "중앙프라자",
+          "address": "경기도 안양시 동안구 평촌대로223번길 42 (호계동)",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "호계체육관",
+          "address": "경기도 안양시 동안구 귀인로80번길 52, 호계체육관 (호계동)",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "달안어린이공원 공중화장실",
+          "address": "경기도 안양시 동안구 비산동 1109-2",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "신세대타운상가",
+          "address": "경기도 안양시 동안구 관평로182번길 48, 신세대상가 (관양동)",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "귀인동 문화복지센터 화장실",
+          "address": "경기도 안양시 동안구 부림로 14",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "평촌청소년문화의집",
+          "address": "경기도 안양시 동안구 흥안대로 394 (평촌동)",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "백두프라자 개방화장실",
+          "address": "경기도 안양시 동안구 평촌대로217번길 27, 백두프라자 (호계동)",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "자유공원 축구장 옆 공중화장실",
+          "address": "경기도 안양시 동안구 평촌대로 76",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "자유공원 옥지압장 옆 공중화장실",
+          "address": "경기도 안양시 동안구 평촌대로 76",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "샘마을대우(아)상가 개방화장실",
+          "address": "경기도 안양시 동안구 흥안대로223번길 19(호계동)",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "안양시의회 공중화장실",
+          "address": "경기도 안양시 동안구 시민대로 233 (관양동, 안양시의회)",
+          "status": "pending",
+          "error": ""
+        }
+      ]
+    },
+    "만안구": {
+      "total": 105,
+      "success": 0,
+      "successRate": 0.0,
+      "statusCounts": {
+        "pending": 105
+      },
+      "failures": [
+        {
+          "name": "삼막사 진입로 공중화장실(경인교대 옆)",
+          "address": "경기도 안양시 만안구 석수동 산15-3",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "병목안시민공원매점옆공중화장실",
+          "address": "경기도 안양시 만안구 안양동 산81-1",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "만안보건소 화장실",
+          "address": "경기도 안양시 만안구 문예로 48",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "석수2동 행정복지센터 화장실",
+          "address": "경기도 안양시 만안구 안양로 496",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "안양3동 행정복지센터 공중화장실",
+          "address": "경기도 안양시 만안구 양화로 28",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "브레인빌딩 개방화장실",
+          "address": "경기도 안양시 만안구 만안로 11(안양동)",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "박달시장 공중화장실",
+          "address": "경기도 안양시 만안구 양화로 132-3 (박달동)",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "석수1동 행정복지센터 화장실",
+          "address": "경기도 안양시 만안구 경수대로 1252",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "안양아트센터",
+          "address": "경기도 안양시 만안구 문예로36번길 16",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "염불사(암) 개방화장실",
+          "address": "경기도 안양시 만안구 예술공원로245번길 150",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "국립농산물품질관리원 경기지원",
+          "address": "경기도 안양시 만안구 안양로 114",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "서조체육시설 관리동 화장실",
+          "address": "경기도 안양시 만안구 삼봉로 158 (박달동)",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "박달복합청사",
+          "address": "경기도 안양시 만안구 박달로 470 (박달동)",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "예술공원 파빌리온 공중화장실",
+          "address": "경기도 안양시 만안구 예술공원로 180",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "중앙시장 번영회 개방화장실",
+          "address": "경기도 안양시 만안구 냉천로 196(안양동)",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "문화빌딩 개방화장실",
+          "address": "경기도 안양시 만안구 안양로 338(안양동)",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "삼막사 공중화장실",
+          "address": "경기도 안양시 만안구 삼막로 478",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "안양5동 행정복지센터공중화장실",
+          "address": "경기도 안양시 만안구 냉천로157번길 18",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "중앙시장 상인회관 공중화장실",
+          "address": "경기도 안양시 만안구 냉천로185번길 8 (안양동)",
+          "status": "pending",
+          "error": ""
+        },
+        {
+          "name": "수원교구 중앙성당",
+          "address": "경기도 안양시 만안구 장내로 116, 천주교수원교구중앙성당 (안양동)",
+          "status": "pending",
+          "error": ""
+        }
+      ]
+    }
+  }
+}
