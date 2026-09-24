@@ -39,3 +39,5 @@ jobs:
             KAKAO_REST_API_KEY
         env:
           KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+
+# secrets-ready trigger
