@@ -1,4 +1,4 @@
-const CACHE="senior-toilet-v0.2.0";
+const CACHE="senior-toilet-v0.4.5";
 const APP_SHELL=["./","./index.html","./manifest.webmanifest","./icon.svg","./data/toilets-fallback.json"];
 
 self.addEventListener("install",event=>{
