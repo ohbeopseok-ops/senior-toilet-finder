@@ -1,5 +1,5 @@
-const CACHE="senior-toilet-v0.4.5";
-const APP_SHELL=["./","./index.html","./manifest.webmanifest","./icon.svg","./data/toilets-fallback.json"];
+const CACHE="senior-toilet-v0.5.0";
+const APP_SHELL=["./","./index.html","./manifest.webmanifest","./icon.svg","./nearby-config.js","./data/toilets-fallback.json"];
 
 self.addEventListener("install",event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(APP_SHELL)).then(()=>self.skipWaiting()));
