@@ -31,6 +31,7 @@ export default {
 
     const queries = ["공중화장실", "화장실", "개방화장실"];
     const all = [];
+    const upstreamErrors = [];
 
     for (const query of queries) {
       const endpoint = new URL("https://dapi.kakao.com/v2/local/search/keyword.json");
@@ -44,7 +45,12 @@ export default {
       const res = await fetch(endpoint.toString(), {
         headers: { Authorization: `KakaoAK ${env.KAKAO_REST_API_KEY}` }
       });
-      if (!res.ok) continue;
+      if (!res.ok) {
+        let detail = "";
+        try { detail = (await res.text()).slice(0, 300); } catch {}
+        upstreamErrors.push({ query, status: res.status, detail });
+        continue;
+      }
       const body = await res.json();
       for (const d of body.documents || []) all.push(d);
     }
@@ -92,6 +98,19 @@ export default {
     }
 
     items.sort((a,b) => a.distance - b.distance);
+
+    if (!items.length && upstreamErrors.length === queries.length) {
+      const first = upstreamErrors[0] || {};
+      return json({
+        error: "kakao_upstream_error",
+        hint: first.status === 401 || first.status === 403
+          ? "Kakao Map API activation or REST API key settings may be required."
+          : "Kakao Local API request failed.",
+        upstreamStatus: first.status || 0,
+        upstreamErrors
+      }, 502, cors);
+    }
+
     return json({
       source: "kakao-local",
       center: { lat, lng },
