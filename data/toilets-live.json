@@ -2,7 +2,7 @@
   "source": "anyang-public-restroom-seed+kakao-address",
   "region": "경기도 안양시",
   "generatedAt": "2026-09-24T13:39:20.108776+00:00",
-  "syncStatus": "kakao-geocoded",
+  "syncStatus": "source-unavailable",
   "officialRecordCount": 249,
   "usableCoordinateCount": 225,
   "geocode": {
@@ -9010,5 +9010,8 @@
     ]
   },
   "openStatusComputedAt": "2026-09-24T22:39:20.665814+09:00",
-  "openStatusParsedCount": 227
+  "openStatusParsedCount": 227,
+  "sourceUrl": "https://file.localdata.go.kr/file/public_restroom_info/info",
+  "lastSyncAttemptAt": "2026-09-24T23:13:55.768940+00:00",
+  "syncError": "HTTP Error 403: Forbidden"
 }
