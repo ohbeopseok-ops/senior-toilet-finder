@@ -1,48 +1,52 @@
-# Senior Toilet Finder — 안심화장실
+# 안심화장실
 
-시니어가 산책이나 외출 중 급하게 화장실을 찾을 때 **큰 글씨, 큰 버튼, 음성 안내, 계단 없는 곳 우선** 원칙으로 빠르게 안내하기 위한 모바일 PWA 프로토타입입니다.
+급한 상황에서 **GPS 기준 가장 가까운 화장실부터** 큰 글씨와 음성으로 안내하는 시니어·보행약자 친화 PWA입니다.
 
-## 핵심 사용자 경험
+## 현재 Production 기능
 
-- 홈 화면에서 한 번 누르는 **가장 가까운 화장실 찾기**
-- GPS 기반 거리 재계산
-- 계단 없는 시설 우선 선택
+- GPS 기준 실제 거리 재계산
+- Kakao Nearby + 안양시 공공데이터 Hybrid 검색
+- 안양시 공공데이터 좌표 사용 가능 시설 225건
+- TOP10 가까운 순 표시
+- 운영시간·장애인시설·비상벨 정보
+- 계단은 Hard Gate가 아니며, 필요 시 `계단 없는 곳 우선` 선택
 - 큰 글씨 / 고대비 UI
 - 한국어 음성 안내(TTS)
-- 홈 화면 설치 가능한 PWA
-- 기본 화면 오프라인 캐시
+- iPhone/Android 홈 화면 설치형 PWA
+- stale cache 방지용 network-first app shell
 
-## 현재 상태
+## 운영 주소
 
-**Prototype V0.1**
+현재:
 
-현재 저장소에 포함된 화장실 좌표, 개방시간, 편의시설, 전화번호 및 길안내는 **실시간 운영 데이터가 아닌 예시 데이터**입니다. 실제 서비스 전환 전에는 공공데이터포털 또는 지자체 공식 데이터 API 연동, 운영시간 검증, 경로 API 연동이 필요합니다.
-
-## 로컬 실행
-
-```bash
-python -m http.server 8000
+```
+https://ohbeopseok-ops.github.io/senior-toilet-finder/
 ```
 
-브라우저에서 `http://localhost:8000` 접속.
+Android 출시용 권장 Production origin:
 
-> GPS / Service Worker / PWA 설치 테스트는 HTTPS 배포 환경에서 확인하는 것을 권장합니다.
+```
+https://toilet.aijoylab.kr/
+```
 
-## GitHub Pages
+custom domain 연결 절차는 `docs/CUSTOM_DOMAIN_TOILET.md` 참고.
 
-배포 URL:
+## QA
 
-`https://ohbeopseok-ops.github.io/senior-toilet-finder/`
+```
+https://ohbeopseok-ops.github.io/senior-toilet-finder/?qa=1
+```
 
-## 다음 개발 우선순위
+현재 Production QA에서 GPS TOP10 거리순 PASS를 확인했습니다.
 
-1. 전국공중화장실표준데이터 또는 지자체 개방화장실 API 연동
-2. 실제 현재 개방 여부 판정
-3. 보행 경로 API 연동 및 계단/급경사 제외
-4. 192px / 512px PNG PWA 아이콘 추가
-5. iPhone Safari, Android Chrome 실기기 접근성 테스트
-6. 사용자 신고 기능: 폐쇄, 잠김, 계단, 고장 정보
+## Android 출시
 
-## License
+Android는 기존 PWA를 Trusted Web Activity(TWA)로 패키징하는 방향입니다.
 
-배포 전 라이선스 정책을 확정해주세요.
+- 제안 package: `kr.aijoylab.seniortoilet`
+- Target SDK: 36
+- 배포 포맷: AAB
+- Play App Signing 사용
+- Digital Asset Links 필요
+
+세부 계획은 `docs/ANDROID_RELEASE_V1.md` 참고.
