@@ -95,8 +95,9 @@
       </button>
 
       <div id="gold-runtime" class="hidden bg-cardDark border-2 border-safeGreen rounded-2xl p-3 text-sm">
-        <div class="font-black text-safeGreen">GOLD QA Runtime</div>
+        <div class="font-black text-safeGreen">Production QA Runtime</div>
         <div id="gold-runtime-text" class="text-gray-200 mt-1">측정 대기 중</div>
+        <div id="qa-hybrid-summary" class="text-gray-300 mt-2 leading-relaxed"></div>
       </div>
 
       <div>
@@ -140,7 +141,7 @@
   </main>
 
   <footer class="bg-[#141414] border-t border-borderDark px-4 py-3 text-center text-xs text-gray-400">
-    Senior Toilet Finder · V0.5.2 · GPS Hybrid Nearby
+    Senior Toilet Finder · V0.5.3 · Production QA
   </footer>
 
 <script>
@@ -408,6 +409,7 @@ function recalcDistances(){
     r.safetyGate=result.gate;
   });
   restroomList.sort(compareRestrooms);
+  updateHybridQaSummary();
 }
 
 function openRank(r){
@@ -439,6 +441,33 @@ function distanceBand(distance){
   if(distance<=500) return "500m 안";
   if(distance<=1000) return "1km 안";
   return "1km 밖";
+}
+
+function updateHybridQaSummary(){
+  if(!new URLSearchParams(location.search).has("qa")) return;
+  const box=document.getElementById("qa-hybrid-summary");
+  if(!box||!userLocation) return;
+
+  const top=restroomList.slice(0,10);
+  const strictNearest=!stairsPriorityMode && top.every((r,i)=>{
+    if(i===0) return true;
+    const prev=top[i-1];
+    if(prev.openStatus==="closed" || r.openStatus==="closed") return true;
+    return prev.distance<=r.distance;
+  });
+
+  const official=restroomList.filter(r=>r.source!=="kakao-local").length;
+  const kakao=restroomList.filter(r=>r.source==="kakao-local").length;
+  const rows=top.map((r,i)=>{
+    const src=r.source==="kakao-local"?"Kakao":"공공";
+    return (i+1)+". "+r.distance+"m · "+src+" · "+r.shortName;
+  }).join("<br>");
+
+  box.innerHTML=
+    '<div class="font-black '+(strictNearest?'text-safeGreen':'text-amber-300')+'">'+
+    '거리순 검증 '+(strictNearest?'PASS':'CHECK')+' · TOP10 '+top.length+'건</div>'+
+    '<div class="mt-1">통합 후보 '+restroomList.length+' · 공공 '+official+' · Kakao '+kakao+'</div>'+
+    '<div class="mt-2 text-[11px] leading-5">'+rows+'</div>';
 }
 
 function calculateSeniorSafetyScore(r){
