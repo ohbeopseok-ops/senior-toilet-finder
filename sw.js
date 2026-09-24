@@ -1,4 +1,4 @@
-const CACHE="senior-toilet-v0.5.2";
+const CACHE="senior-toilet-v0.5.3";
 const APP_SHELL=["./manifest.webmanifest","./icon.svg"];
 
 self.addEventListener("install",event=>{
