@@ -1,0 +1,49 @@
+name: Geocode Anyang with Kakao
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "scripts/geocode_anyang_kakao.py"
+      - "scripts/dedupe_anyang_live.py"
+      - "scripts/report_anyang_kakao.py"
+      - ".github/workflows/geocode-anyang-kakao.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  geocode:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Geocode 249 public toilets with Kakao
+        env:
+          KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+        run: python3 scripts/geocode_anyang_kakao.py
+
+      - name: Deduplicate official records
+        run: python3 scripts/dedupe_anyang_live.py
+
+      - name: Compute open status
+        run: python3 scripts/compute_open_status.py
+
+      - name: Build failure report
+        run: python3 scripts/report_anyang_kakao.py
+
+      - name: Commit live data and report
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/toilets-live.json data/anyang-kakao-geocode-report.json docs/ANYANG_KAKAO_GEOCODE_REPORT.md
+          if git diff --cached --quiet; then
+            echo "No changes"
+            exit 0
+          fi
+          git commit -m "data: geocode and merge Anyang public toilets with Kakao"
+          git push
