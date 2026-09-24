@@ -12,6 +12,7 @@
   <link rel="icon" href="./icon.svg" type="image/svg+xml" />
   <title>안심화장실 - 시니어 무장애 길안내</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="./nearby-config.js"></script>
   <script>
     tailwind.config={theme:{extend:{colors:{safeYellow:'#FFD600',safeYellowHover:'#E5C000',bgDark:'#121212',cardDark:'#1E1E1E',borderDark:'#333333',safeGreen:'#00E676',safeRed:'#FF3B30'}}}}
   </script>
@@ -139,11 +140,13 @@
   </main>
 
   <footer class="bg-[#141414] border-t border-borderDark px-4 py-3 text-center text-xs text-gray-400">
-    Senior Toilet Finder · V0.4.5 · GPS Validated Nearest First
+    Senior Toilet Finder · V0.5 · GPS Hybrid Nearby
   </footer>
 
 <script>
 let restroomList=[];
+let officialRestroomList=[];
+let nearbyRestroomList=[];
 let dataSourceMode="loading";
 let voiceEnabled=true,largeFontMode=false,currentNavTarget=null,remainingDistance=0;
 let stairsPriorityMode=localStorage.getItem("stairsPriorityMode")==="1";
@@ -183,32 +186,36 @@ function isValidCoordinate(rawLat,rawLng){
 async function loadRestroomData(){
   const banner=document.getElementById("data-status-banner");
   const qaMode=new URLSearchParams(location.search).has("qa");
+  officialRestroomList=[];
+  nearbyRestroomList=[];
+
   try{
     const live=await loadJson("./data/toilets-live.json");
     const usable=(live.items||[]).filter(x=>isValidCoordinate(x.lat,x.lng));
-    if(usable.length){
-      restroomList=usable.map(normalizeRestroom);
+    officialRestroomList=usable.map(normalizeRestroom);
+
+    if(officialRestroomList.length){
       dataSourceMode="official-live";
-      banner.textContent="🟢 실제 위치 정보 사용 중";
+      banner.textContent="🟢 공공데이터 좌표 준비됨 · GPS 주변검색 대기";
       banner.className="status-copy bg-green-300 text-black px-3 py-2 text-center text-sm font-black";
     }else if(qaMode){
       const fallback=await loadJson("./data/toilets-fallback.json");
-      restroomList=(fallback.items||[]).filter(x=>isValidCoordinate(x.lat,x.lng)).map(normalizeRestroom);
+      officialRestroomList=(fallback.items||[]).filter(x=>isValidCoordinate(x.lat,x.lng)).map(normalizeRestroom);
       dataSourceMode="fallback";
       banner.textContent="🟡 QA 시험좌표 사용 중";
       banner.className="status-copy bg-amber-300 text-black px-3 py-2 text-center text-sm font-black";
     }else{
-      restroomList=[];
-      dataSourceMode="coordinates-pending";
-      banner.textContent="🟡 실제 화장실 좌표 연결 준비 중";
+      dataSourceMode="gps-nearby-waiting";
+      banner.textContent="📍 GPS로 가까운 화장실을 찾을 준비가 됐어요";
       banner.className="status-copy bg-amber-300 text-black px-3 py-2 text-center text-sm font-black";
     }
   }catch(e){
-    restroomList=[];
-    dataSourceMode="unavailable";
-    banner.textContent="🔴 화장실 위치정보를 불러오지 못했어요";
-    banner.className="status-copy bg-red-300 text-black px-3 py-2 text-center text-sm font-black";
+    dataSourceMode="gps-nearby-waiting";
+    banner.textContent="📍 GPS 주변검색을 준비 중이에요";
+    banner.className="status-copy bg-amber-300 text-black px-3 py-2 text-center text-sm font-black";
   }
+
+  restroomList=[...officialRestroomList];
   updateStairsPriorityUI();
   renderQuickList();
 }
@@ -227,6 +234,9 @@ function normalizeRestroom(r,i){
     stairs:Boolean(r.stairs),ramp:Boolean(r.ramp),handrail:Boolean(r.handrail),
     emergencyBell:Boolean(r.emergencyBell),
     accessibleToilet:Boolean(r.accessibleToilet)||Number(r.maleAccessible||0)>0||Number(r.femaleAccessible||0)>0,
+    placeUrl:r.placeUrl||"",
+    categoryName:r.categoryName||"",
+    source:r.source||"",
     tel:r.tel||"",
     verified:Boolean(r.verified),
     openStatusVerified:Boolean(r.openStatusVerified),
@@ -249,7 +259,10 @@ function initGeolocation(fromSetup=false){
    userLocation={lat:p.coords.latitude,lng:p.coords.longitude};
    loc.textContent="📍 현재 위치 확인됨";
    status.textContent="● GPS 연결"; status.className="text-xs text-safeGreen font-bold";
-   recalcDistances();renderQuickList();
+   refreshNearbyFromGPS().finally(()=>{
+     recalcDistances();
+     renderQuickList();
+   });
    const b=document.getElementById("setup-location-btn");
    if(b){b.textContent="1. ✅ 위치 허용 완료";b.className="w-full py-4 rounded-2xl bg-safeGreen text-black text-lg font-black text-left px-4";}
  },()=>{
@@ -288,6 +301,91 @@ function finishSetup(){
 }
 
 function calculateDistance(a,b,c,d){const R=6371e3,p1=a*Math.PI/180,p2=c*Math.PI/180,dp=(c-a)*Math.PI/180,dl=(d-b)*Math.PI/180;const x=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
+
+function normalizeName(name){
+  return String(name||"").replace(/\s+/g,"").replace(/[()\[\]·ㆍ.,-]/g,"").toLowerCase();
+}
+
+function mergeNearbySources(){
+  const merged=[];
+  const candidates=[...officialRestroomList,...nearbyRestroomList];
+
+  for(const item of candidates){
+    if(!isValidCoordinate(item.lat,item.lng)) continue;
+    let duplicateIndex=-1;
+    for(let i=0;i<merged.length;i++){
+      const other=merged[i];
+      const meters=calculateDistance(item.lat,item.lng,other.lat,other.lng);
+      const sameName=normalizeName(item.name)===normalizeName(other.name);
+      if((sameName&&meters<=120)||meters<=25){
+        duplicateIndex=i;
+        break;
+      }
+    }
+    if(duplicateIndex<0){
+      merged.push(item);
+    }else{
+      const current=merged[duplicateIndex];
+      const officialCurrent=current.source!=="kakao-local";
+      const officialIncoming=item.source!=="kakao-local";
+      if(officialIncoming&&!officialCurrent){
+        item.placeUrl=current.placeUrl||item.placeUrl||"";
+        merged[duplicateIndex]=item;
+      }else{
+        current.placeUrl=current.placeUrl||item.placeUrl||"";
+      }
+    }
+  }
+
+  restroomList=merged;
+  if(userLocation) recalcDistances();
+}
+
+async function refreshNearbyFromGPS(){
+  if(!userLocation) return;
+  const banner=document.getElementById("data-status-banner");
+  const apiBase=(window.SENIOR_TOILET_CONFIG&&window.SENIOR_TOILET_CONFIG.nearbyApiBase||"").replace(/\/$/,"");
+
+  if(!apiBase){
+    nearbyRestroomList=[];
+    mergeNearbySources();
+    if(!officialRestroomList.length){
+      banner.textContent="🟡 GPS는 연결됨 · 주변검색 API 연결 대기";
+      banner.className="status-copy bg-amber-300 text-black px-3 py-2 text-center text-sm font-black";
+    }
+    return;
+  }
+
+  banner.textContent="🔎 GPS 기준 가까운 화장실 찾는 중...";
+  banner.className="status-copy bg-amber-300 text-black px-3 py-2 text-center text-sm font-black";
+
+  try{
+    const url=`${apiBase}/nearby?lat=${encodeURIComponent(userLocation.lat)}&lng=${encodeURIComponent(userLocation.lng)}&radius=3000`;
+    const data=await loadJson(url);
+    nearbyRestroomList=(data.items||[]).filter(x=>isValidCoordinate(x.lat,x.lng)).map(normalizeRestroom);
+    mergeNearbySources();
+
+    if(restroomList.length){
+      dataSourceMode=officialRestroomList.length?"hybrid-nearby":"gps-nearby";
+      banner.textContent=officialRestroomList.length
+        ?"🟢 GPS 주변검색 + 공공데이터 통합"
+        :"🟢 GPS 기준 가까운 화장실 검색";
+      banner.className="status-copy bg-green-300 text-black px-3 py-2 text-center text-sm font-black";
+    }else{
+      banner.textContent="🟡 3km 안에서 화장실 후보를 찾지 못했어요";
+      banner.className="status-copy bg-amber-300 text-black px-3 py-2 text-center text-sm font-black";
+    }
+  }catch(e){
+    nearbyRestroomList=[];
+    mergeNearbySources();
+    banner.textContent=officialRestroomList.length
+      ?"🟡 주변검색 실패 · 공공데이터만 표시"
+      :"🔴 주변 화장실 검색을 불러오지 못했어요";
+    banner.className=officialRestroomList.length
+      ?"status-copy bg-amber-300 text-black px-3 py-2 text-center text-sm font-black"
+      :"status-copy bg-red-300 text-black px-3 py-2 text-center text-sm font-black";
+  }
+}
 function recalcDistances(){
   if(!userLocation) return;
   restroomList.forEach(r=>{
@@ -374,10 +472,11 @@ function renderQuickList(){
    const distanceText=distanceBand(r.distance);
    const accessText=r.accessibleToilet?"♿ 장애인시설":"";
    const bellText=r.emergencyBell?"🔔 비상벨":"";
+   const sourceText=r.source==="kakao-local"?"카카오 주변검색":(r.verified?"공공데이터":"참고데이터");
    const qaMeta=qaMode
-      ? `<div class="text-[11px] text-amber-300 font-bold mt-1">QA · Safety ${r.safetyScore}/100 · ${r.verified?'공식':'검증 캐시'}</div>`
+      ? `<div class="text-[11px] text-amber-300 font-bold mt-1">QA · Safety ${r.safetyScore}/100 · ${sourceText}</div>`
       : "";
-   const actionText=dataSourceMode==="official-live"?"안내 ›":"시험 안내 ›";
+   const actionText=(dataSourceMode==="fallback")?"시험 안내 ›":"안내 ›";
 
    card.innerHTML=`<div class="min-w-0 flex-1 pr-1">
       <div class="text-sm font-bold text-gray-300 mb-1">${safetyText} · ${distanceText} · ${stairsText}</div>
