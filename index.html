@@ -140,7 +140,7 @@
   </main>
 
   <footer class="bg-[#141414] border-t border-borderDark px-4 py-3 text-center text-xs text-gray-400">
-    Senior Toilet Finder · V0.5 · GPS Hybrid Nearby
+    Senior Toilet Finder · V0.5.1 · GPS Hybrid Nearby
   </footer>
 
 <script>
@@ -172,7 +172,14 @@ document.addEventListener("DOMContentLoaded",async()=>{
 
 async function loadJson(url){
   const r=await fetch(url,{cache:"no-store"});
-  if(!r.ok) throw new Error(url+" "+r.status);
+  if(!r.ok){
+    let detail={};
+    try{detail=await r.json();}catch{}
+    const err=new Error(url+" "+r.status);
+    err.status=r.status;
+    err.detail=detail;
+    throw err;
+  }
   return r.json();
 }
 
@@ -378,12 +385,15 @@ async function refreshNearbyFromGPS(){
   }catch(e){
     nearbyRestroomList=[];
     mergeNearbySources();
+    const kakaoConfigIssue=e&&e.detail&&e.detail.error==="kakao_upstream_error";
     banner.textContent=officialRestroomList.length
       ?"🟡 주변검색 실패 · 공공데이터만 표시"
-      :"🔴 주변 화장실 검색을 불러오지 못했어요";
+      :(kakaoConfigIssue
+        ?"🟠 카카오맵 API 사용 설정을 확인해주세요"
+        :"🔴 주변 화장실 검색을 불러오지 못했어요");
     banner.className=officialRestroomList.length
       ?"status-copy bg-amber-300 text-black px-3 py-2 text-center text-sm font-black"
-      :"status-copy bg-red-300 text-black px-3 py-2 text-center text-sm font-black";
+      :"status-copy bg-orange-300 text-black px-3 py-2 text-center text-sm font-black";
   }
 }
 function recalcDistances(){
