@@ -1,0 +1,162 @@
+{
+  "generatedAt": "2026-09-24T13:39:20.721103",
+  "officialRecordCount": 249,
+  "uniqueUsableCoordinateCount": 225,
+  "failedCount": 2,
+  "successRate": 90.4,
+  "dedupe": {
+    "inputGeocoded": 247,
+    "uniqueGeocoded": 225,
+    "mergedDuplicates": 22,
+    "groups": [
+      {
+        "kept": "anyang-202238300000102019",
+        "merged": "anyang-202238300000102018",
+        "name": "자유공원 옥지압장 옆 공중화장실"
+      },
+      {
+        "kept": "anyang-202438300000100015",
+        "merged": "anyang-202438300000100016",
+        "name": "서조체육시설다목적구장 화장실"
+      },
+      {
+        "kept": "anyang-202238300000101976",
+        "merged": "anyang-202238300000101973",
+        "name": "안양종합운동장 빙상장"
+      },
+      {
+        "kept": "anyang-202438300000100012",
+        "merged": "anyang-202238300000101848",
+        "name": "박달2동 행정복지센터 화장실"
+      },
+      {
+        "kept": "anyang-202238300000101756",
+        "merged": "anyang-202438300000100024",
+        "name": "간촌유아숲체험 어린이화장실"
+      },
+      {
+        "kept": "anyang-202438300000100010",
+        "merged": "anyang-202438300000100011",
+        "name": "비산체육공원 간이화장실"
+      },
+      {
+        "kept": "anyang-202438300000100014",
+        "merged": "anyang-202438300000100013",
+        "name": "안양새물공원"
+      },
+      {
+        "kept": "anyang-202238300000102047",
+        "merged": "anyang-202238300000102048",
+        "name": "평촌공원 사무실 공중화장실"
+      },
+      {
+        "kept": "anyang-202238300000101964",
+        "merged": "anyang-202238300000101963",
+        "name": "안양역(1호선) 공중화장실(안양역사 2층)"
+      },
+      {
+        "kept": "anyang-202238300000102019",
+        "merged": "anyang-202238300000102017",
+        "name": "자유공원 론볼링장 옆 공중화장실"
+      },
+      {
+        "kept": "anyang-202238300000102019",
+        "merged": "anyang-202238300000102020",
+        "name": "자유공원 테니스장 옆 공중화장실"
+      },
+      {
+        "kept": "anyang-202238300000102023",
+        "merged": "anyang-202238300000102025",
+        "name": "중앙공원 주차장 옆 공중화장실"
+      },
+      {
+        "kept": "anyang-202238300000102023",
+        "merged": "anyang-202238300000102024",
+        "name": "중앙공원 매점 앞 공중화장실"
+      },
+      {
+        "kept": "anyang-202238300000101958",
+        "merged": "anyang-202238300000101819",
+        "name": "동안평생교육센터 화장실"
+      },
+      {
+        "kept": "anyang-202238300000101976",
+        "merged": "anyang-202238300000101974",
+        "name": "안양종합운동장 수영장"
+      },
+      {
+        "kept": "anyang-202438300000100006",
+        "merged": "anyang-202238300000101772",
+        "name": "관양시장문화센터 개방화장실"
+      },
+      {
+        "kept": "anyang-202238300000102088",
+        "merged": "anyang-202238300000102086",
+        "name": "호계공원 매봉광장 옆 공중화장실"
+      },
+      {
+        "kept": "anyang-202438300000100005",
+        "merged": "anyang-202238300000101851",
+        "name": "박달시장 상인회관 개방화장실"
+      },
+      {
+        "kept": "anyang-202438300000100003",
+        "merged": "anyang-202238300000102029",
+        "name": "중앙시장 상인회관 개방화장실"
+      },
+      {
+        "kept": "anyang-202238300000101976",
+        "merged": "anyang-202238300000101977",
+        "name": "안양종합운동장 체육관"
+      },
+      {
+        "kept": "anyang-202238300000101940",
+        "merged": "anyang-202238300000102084",
+        "name": "호계3동 행정복지센터 화장실"
+      },
+      {
+        "kept": "anyang-202238300000101958",
+        "merged": "anyang-202238300000101817",
+        "name": "동안청소년수련관"
+      }
+    ]
+  },
+  "districts": {
+    "동안구": {
+      "total": 125,
+      "success": 125,
+      "failed": 0,
+      "successRate": 100.0
+    },
+    "만안구": {
+      "total": 99,
+      "success": 97,
+      "failed": 2,
+      "successRate": 98.0
+    },
+    "구 미분류": {
+      "total": 3,
+      "success": 3,
+      "failed": 0,
+      "successRate": 100.0
+    }
+  },
+  "failures": [
+    {
+      "id": "anyang-202238300000101764",
+      "name": "관악수목원 공중화장실",
+      "district": "만안구",
+      "roadAddress": "",
+      "lotAddress": "경기도 안양시 만안구 석수동 산11",
+      "error": ""
+    },
+    {
+      "id": "anyang-202238300000102039",
+      "name": "최경환성지 앞 공중화장실",
+      "district": "만안구",
+      "roadAddress": "",
+      "lotAddress": "경기도 안양시 만안구 안양동 산 177",
+      "error": ""
+    }
+  ]
+}
