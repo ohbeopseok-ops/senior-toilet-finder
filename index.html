@@ -140,7 +140,7 @@
   </main>
 
   <footer class="bg-[#141414] border-t border-borderDark px-4 py-3 text-center text-xs text-gray-400">
-    Senior Toilet Finder · V0.5.1 · GPS Hybrid Nearby
+    Senior Toilet Finder · V0.5.2 · GPS Hybrid Nearby
   </footer>
 
 <script>
@@ -159,7 +159,10 @@ const isIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platf
 const isStandalone=()=>window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone===true;
 
 document.addEventListener("DOMContentLoaded",async()=>{
-  if("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(()=>{});
+  if("serviceWorker" in navigator){
+    navigator.serviceWorker.addEventListener("controllerchange",()=>location.reload());
+  }
+  if("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js",{updateViaCache:"none"}).then(reg=>reg.update()).catch(()=>{});
   window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;});
   await loadRestroomData();
   if(isIOS()&&!isStandalone()&&!localStorage.getItem("seniorToiletSetupDone")){
