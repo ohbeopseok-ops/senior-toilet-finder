@@ -139,7 +139,7 @@
   </main>
 
   <footer class="bg-[#141414] border-t border-borderDark px-4 py-3 text-center text-xs text-gray-400">
-    Senior Toilet Finder · V0.4.4 · Nearest First + Optional Stairs Priority
+    Senior Toilet Finder · V0.4.5 · GPS Validated Nearest First
   </footer>
 
 <script>
@@ -147,7 +147,7 @@ let restroomList=[];
 let dataSourceMode="loading";
 let voiceEnabled=true,largeFontMode=false,currentNavTarget=null,remainingDistance=0;
 let stairsPriorityMode=localStorage.getItem("stairsPriorityMode")==="1";
-let userLocation={lat:37.3938,lng:126.9560};
+let userLocation=null;
 let deferredPrompt=null;
 let orientationListenerBound=false;
 let guidanceStartTs=0;
@@ -173,25 +173,41 @@ async function loadJson(url){
   return r.json();
 }
 
+function isValidCoordinate(rawLat,rawLng){
+  if(rawLat===null||rawLat===undefined||rawLat===""||rawLng===null||rawLng===undefined||rawLng==="") return false;
+  const lat=Number(rawLat),lng=Number(rawLng);
+  if(!Number.isFinite(lat)||!Number.isFinite(lng)) return false;
+  return lat>=33&&lat<=39&&lng>=124&&lng<=132;
+}
+
 async function loadRestroomData(){
   const banner=document.getElementById("data-status-banner");
+  const qaMode=new URLSearchParams(location.search).has("qa");
   try{
     const live=await loadJson("./data/toilets-live.json");
-    const usable=(live.items||[]).filter(x=>Number.isFinite(Number(x.lat))&&Number.isFinite(Number(x.lng)));
+    const usable=(live.items||[]).filter(x=>isValidCoordinate(x.lat,x.lng));
     if(usable.length){
       restroomList=usable.map(normalizeRestroom);
       dataSourceMode="official-live";
       banner.textContent="🟢 실제 위치 정보 사용 중";
       banner.className="status-copy bg-green-300 text-black px-3 py-2 text-center text-sm font-black";
+    }else if(qaMode){
+      const fallback=await loadJson("./data/toilets-fallback.json");
+      restroomList=(fallback.items||[]).filter(x=>isValidCoordinate(x.lat,x.lng)).map(normalizeRestroom);
+      dataSourceMode="fallback";
+      banner.textContent="🟡 QA 시험좌표 사용 중";
+      banner.className="status-copy bg-amber-300 text-black px-3 py-2 text-center text-sm font-black";
     }else{
-      throw new Error("official dataset has no usable coordinates");
+      restroomList=[];
+      dataSourceMode="coordinates-pending";
+      banner.textContent="🟡 실제 화장실 좌표 연결 준비 중";
+      banner.className="status-copy bg-amber-300 text-black px-3 py-2 text-center text-sm font-black";
     }
   }catch(e){
-    const fallback=await loadJson("./data/toilets-fallback.json");
-    restroomList=(fallback.items||[]).map(normalizeRestroom);
-    dataSourceMode="fallback";
-    banner.textContent="🟡 시험 운영 중 · 위치정보 확인 필요";
-    banner.className="status-copy bg-amber-300 text-black px-3 py-2 text-center text-sm font-black";
+    restroomList=[];
+    dataSourceMode="unavailable";
+    banner.textContent="🔴 화장실 위치정보를 불러오지 못했어요";
+    banner.className="status-copy bg-red-300 text-black px-3 py-2 text-center text-sm font-black";
   }
   updateStairsPriorityUI();
   renderQuickList();
@@ -202,7 +218,8 @@ function normalizeRestroom(r,i){
     id:r.id??("restroom-"+i),
     name:r.name||r.shortName||"공중화장실",
     shortName:r.shortName||r.name||"공중화장실",
-    lat:Number(r.lat),lng:Number(r.lng),
+    lat:isValidCoordinate(r.lat,r.lng)?Number(r.lat):NaN,
+    lng:isValidCoordinate(r.lat,r.lng)?Number(r.lng):NaN,
     distance:Number(r.distance||0),
     openHours:r.openHours||"개방시간 확인 필요",
     openStatus:r.openStatus||"unknown",
@@ -272,6 +289,7 @@ function finishSetup(){
 
 function calculateDistance(a,b,c,d){const R=6371e3,p1=a*Math.PI/180,p2=c*Math.PI/180,dp=(c-a)*Math.PI/180,dl=(d-b)*Math.PI/180;const x=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
 function recalcDistances(){
+  if(!userLocation) return;
   restroomList.forEach(r=>{
     r.distance=Math.round(calculateDistance(userLocation.lat,userLocation.lng,r.lat,r.lng));
     const result=calculateSeniorSafetyScore(r);
@@ -338,7 +356,14 @@ function calculateSeniorSafetyScore(r){
 function renderQuickList(){
  const el=document.getElementById("quick-toilet-list"); el.innerHTML="";
  const qaMode=new URLSearchParams(location.search).has("qa");
- if(!restroomList.length){el.innerHTML='<div class="p-4 text-center text-gray-300">화장실 정보를 준비 중이에요.</div>';return;}
+ if(!restroomList.length){
+   el.innerHTML='<div class="p-5 text-center text-gray-300 bg-cardDark border-2 border-borderDark rounded-2xl">실제 화장실 좌표를 준비 중이에요.<br><span class="text-sm text-gray-400">잘못된 먼 화장실을 보여드리지 않도록 임시 좌표는 숨겼어요.</span></div>';
+   return;
+ }
+ if(!userLocation){
+   el.innerHTML='<div class="p-5 text-center text-gray-200 bg-cardDark border-2 border-borderDark rounded-2xl">📍 현재 위치를 확인하면<br><b class="text-safeYellow">가까운 순</b>으로 보여드릴게요.</div>';
+   return;
+ }
  restroomList.slice(0,10).forEach(r=>{
    const min=Math.max(1,Math.ceil(r.distance/50)),card=document.createElement("button");
    card.className="w-full text-left bg-cardDark border-2 border-borderDark rounded-2xl px-4 py-3 flex justify-between items-center gap-3 active:scale-[.99]";
@@ -372,7 +397,15 @@ function renderQuickList(){
 
 function startEmergencySearch(){
   guidanceStartTs=performance.now();
-  if(!restroomList.length){speak("화장실 데이터를 불러오는 중입니다. 잠시 후 다시 눌러주세요.");return;}
+  if(!userLocation){
+    speak("현재 위치를 먼저 확인하고 있습니다.");
+    initGeolocation();
+    return;
+  }
+  if(!restroomList.length){
+    speak("실제 화장실 좌표를 준비 중입니다. 잠시 후 다시 확인해주세요.");
+    return;
+  }
   recalcDistances();
 
   // 계단은 제외 조건이 아니다. 확인된 '닫힘'만 뒤로 보내고 가장 가까운 후보를 우선한다.
