@@ -141,7 +141,7 @@
   </main>
 
   <footer class="bg-[#141414] border-t border-borderDark px-4 py-3 text-center text-xs text-gray-400">
-    Senior Toilet Finder · V0.5.3 · Production QA
+    Senior Toilet Finder · V0.5.4 · Production QA
   </footer>
 
 <script>
@@ -328,7 +328,13 @@ function mergeNearbySources(){
       const other=merged[i];
       const meters=calculateDistance(item.lat,item.lng,other.lat,other.lng);
       const sameName=normalizeName(item.name)===normalizeName(other.name);
-      if((sameName&&meters<=120)||meters<=25){
+      const sameAddress=normalizeName(item.address)&&normalizeName(item.address)===normalizeName(other.address);
+      const crossSource=(item.source==="kakao-local")!==(other.source==="kakao-local");
+
+      // Never collapse two distinct official toilets only because coordinates are close.
+      // Cross-source Kakao↔official candidates may merge by very close position,
+      // while same-source records require matching name/address.
+      if((sameName&&meters<=120)||(sameAddress&&meters<=60)||(crossSource&&meters<=25)){
         duplicateIndex=i;
         break;
       }
@@ -620,7 +626,7 @@ function updateGoldRuntime(elapsed,r){
   const box=document.getElementById("gold-runtime");
   const text=document.getElementById("gold-runtime-text");
   box.classList.remove("hidden");
-  text.textContent=`버튼→안내 ${elapsed}ms · Safety ${r.safetyScore}/100 · Gate ${r.safetyGate?"PASS":"NO"}`;
+  text.textContent=`버튼→안내 ${elapsed}ms · 거리 ${r.distance}m · ${r.openStatus==="closed"?"현재 닫힘":"거리 우선"}`;
 }
 
 if(new URLSearchParams(location.search).has("qa")){
