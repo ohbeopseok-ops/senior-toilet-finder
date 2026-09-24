@@ -1,11 +1,13 @@
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    const allowedOrigin = env.ALLOWED_ORIGIN || "https://ohbeopseok-ops.github.io";
+    const allowedOrigins = (env.ALLOWED_ORIGINS || "https://ohbeopseok-ops.github.io,https://toilet.aijoylab.kr")
+      .split(",").map(x=>x.trim()).filter(Boolean);
     const origin = request.headers.get("Origin") || "";
+    const corsOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
 
     const cors = {
-      "Access-Control-Allow-Origin": origin === allowedOrigin ? origin : allowedOrigin,
+      "Access-Control-Allow-Origin": corsOrigin,
       "Access-Control-Allow-Methods": "GET,OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type",
       "Cache-Control": "no-store"
