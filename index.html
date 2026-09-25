@@ -14,6 +14,12 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="./nearby-config.js"></script>
   <script>
+    // Migrate legacy GitHub Pages/PWA installs to the production domain.
+    if (location.hostname === "ohbeopseok-ops.github.io") {
+      location.replace("https://toilet.aijoylab.kr/" + location.search + location.hash);
+    }
+  </script>
+  <script>
     tailwind.config={theme:{extend:{colors:{safeYellow:'#FFD600',safeYellowHover:'#E5C000',bgDark:'#121212',cardDark:'#1E1E1E',borderDark:'#333333',safeGreen:'#00E676',safeRed:'#FF3B30'}}}}
   </script>
   <style>
@@ -141,7 +147,7 @@
   </main>
 
   <footer class="bg-[#141414] border-t border-borderDark px-4 py-3 text-center text-xs text-gray-400">
-    Senior Toilet Finder · V0.5.4 · Production QA
+    Senior Toilet Finder · V0.5.5 · Mobile Safety
   </footer>
 
 <script>
@@ -267,7 +273,16 @@ function initGeolocation(fromSetup=false){
  const loc=document.getElementById("current-location-text"),status=document.getElementById("gps-status-indicator");
  if(!("geolocation" in navigator)){loc.textContent="📍 이 기기에서는 위치 기능을 사용할 수 없습니다";return;}
  navigator.geolocation.getCurrentPosition(p=>{
-   userLocation={lat:p.coords.latitude,lng:p.coords.longitude};
+   const lat=Number(p.coords.latitude), lng=Number(p.coords.longitude);
+   if(!isValidCoordinate(lat,lng)){
+     userLocation=null;
+     loc.textContent="📍 위치 좌표를 다시 확인해주세요";
+     status.textContent="○ GPS 좌표 오류";
+     status.className="text-xs text-amber-300 font-bold";
+     renderQuickList();
+     return;
+   }
+   userLocation={lat,lng};
    loc.textContent="📍 현재 위치 확인됨";
    status.textContent="● GPS 연결"; status.className="text-xs text-safeGreen font-bold";
    refreshNearbyFromGPS().finally(()=>{
@@ -407,12 +422,17 @@ async function refreshNearbyFromGPS(){
   }
 }
 function recalcDistances(){
-  if(!userLocation) return;
-  restroomList.forEach(r=>{
-    r.distance=Math.round(calculateDistance(userLocation.lat,userLocation.lng,r.lat,r.lng));
+  if(!userLocation || !isValidCoordinate(userLocation.lat,userLocation.lng)) return;
+  restroomList=restroomList.filter(r=>{
+    if(!isValidCoordinate(r.lat,r.lng)) return false;
+    const meters=calculateDistance(userLocation.lat,userLocation.lng,r.lat,r.lng);
+    // Korea-only safety guard: impossible/stale coordinates must never reach the UI.
+    if(!Number.isFinite(meters) || meters<0 || meters>700000) return false;
+    r.distance=Math.round(meters);
     const result=calculateSeniorSafetyScore(r);
     r.safetyScore=result.score;
     r.safetyGate=result.gate;
+    return true;
   });
   restroomList.sort(compareRestrooms);
   updateHybridQaSummary();
