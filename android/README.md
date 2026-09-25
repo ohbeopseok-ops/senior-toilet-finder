@@ -1,22 +1,28 @@
-# Android
+# 안심화장실 Android
 
-안심화장실 Android 앱은 기존 PWA를 Trusted Web Activity(TWA)로 배포하는 방향으로 설계한다.
+Production PWA `https://toilet.aijoylab.kr/`를 Trusted Web Activity(TWA)로 패키징한다.
 
-## Proposed identity
-
+## Identity
 - Application ID: `kr.aijoylab.seniortoilet`
 - App name: `안심화장실`
-- Target SDK: 36
-- Start URL: Android 배포 도메인 확정 후 고정
+- Version: `1.0.0` / versionCode `1`
+- compileSdk: `36`
+- targetSdk: `36`
+- minSdk: `23`
+- TWA helper: `com.google.androidbrowserhelper:androidbrowserhelper:2.7.3`
 
-## Blocker before generating the production TWA project
+## Build
+GitHub Actions의 `Android TWA Build` workflow가 다음을 생성한다.
 
-Digital Asset Links must be served from the root of the exact web origin:
+- Debug APK
+- Release AAB (현재 signing secret 연결 전 단계)
 
-```
-https://<host>/.well-known/assetlinks.json
-```
+## Production TWA verification
+Play Console에서 앱을 생성하고 Play App Signing certificate의 SHA-256을 확보한 뒤:
 
-현재 GitHub Pages project URL은 origin root를 이 repository가 직접 소유하지 않으므로, production Android project 생성 전에 전용 도메인 `toilet.aijoylab.kr` 사용을 권장한다.
+1. `android/assetlinks.template.json`의 지문을 교체
+2. `/.well-known/assetlinks.json`으로 Production 도메인에 배포
+3. `https://toilet.aijoylab.kr/.well-known/assetlinks.json` 200 확인
+4. Play 설치본에서 주소창 없는 TWA 실행 확인
 
-See `docs/ANDROID_RELEASE_V1.md`.
+Upload key와 Play App Signing key는 서로 다를 수 있으므로 최종 assetlinks에는 Play App Signing certificate SHA-256을 사용한다.
