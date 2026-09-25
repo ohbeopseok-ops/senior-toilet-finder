@@ -1,8 +1,8 @@
 {
-  "name": "안심화장실 - 시니어 무장애 길안내",
+  "name": "안심화장실 - 가까운 화장실 찾기",
   "short_name": "안심화장실",
-  "start_url": "./",
-  "scope": "./",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#121212",
   "theme_color": "#121212",
