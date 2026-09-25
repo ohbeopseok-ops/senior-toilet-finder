@@ -35,3 +35,11 @@ Play Console 입력 시 실제 구현과 운영 정책을 다시 대조해 최�
 8. Signed production AAB
 9. Internal testing
 10. Production submission
+
+
+## Upload key
+- Alias: `upload`
+- Upload certificate SHA-256: `48:2E:7F:21:8F:C8:A6:C7:88:99:7C:DF:81:1C:8F:70:53:60:55:77:4F:6F:92:CD:62:60:84:29:F2:84:BA:07`
+- 비밀번호/keystore는 저장소에 커밋하지 않는다.
+- Netlify `TWA_SHA256_FINGERPRINTS`에는 현재 이 지문이 등록되어 사이드로드 QA를 지원한다.
+- Play App Signing certificate SHA-256이 발급되면 같은 환경변수에 쉼표로 추가한다.
