@@ -1,9 +1,13 @@
 export default async (_req: Request) => {
-  const fingerprint = Netlify.env.get("PLAY_APP_SIGNING_SHA256")?.trim();
+  const raw = Netlify.env.get("TWA_SHA256_FINGERPRINTS")?.trim()
+    || Netlify.env.get("PLAY_APP_SIGNING_SHA256")?.trim()
+    || "";
 
-  if (!fingerprint) {
+  const fingerprints = raw.split(",").map(x => x.trim()).filter(Boolean);
+
+  if (!fingerprints.length) {
     return Response.json(
-      { error: "play_app_signing_sha256_not_configured" },
+      { error: "twa_sha256_fingerprints_not_configured" },
       { status: 503, headers: { "Cache-Control": "no-store" } }
     );
   }
@@ -13,7 +17,7 @@ export default async (_req: Request) => {
     target: {
       namespace: "android_app",
       package_name: "kr.aijoylab.seniortoilet",
-      sha256_cert_fingerprints: [fingerprint]
+      sha256_cert_fingerprints: fingerprints
     }
   }];
 
