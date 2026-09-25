@@ -1,4 +1,4 @@
-const CACHE="senior-toilet-v0.5.4";
+const CACHE="senior-toilet-v0.5.5";
 const APP_SHELL=["./manifest.webmanifest","./icon.svg"];
 
 self.addEventListener("install",event=>{
@@ -21,11 +21,10 @@ self.addEventListener("fetch",event=>{
   if(event.request.method!=="GET") return;
 
   const url=new URL(event.request.url);
-  const isAppHtml=event.request.mode==="navigate" || url.pathname.endsWith("/index.html") || url.pathname.endsWith("/senior-toilet-finder/");
+  const isAppHtml=event.request.mode==="navigate" || url.pathname.endsWith("/index.html") || url.pathname.endsWith("/senior-toilet-finder/") || url.pathname==="/";
   const isRuntimeConfig=url.pathname.endsWith("/nearby-config.js");
   const isLiveData=url.pathname.endsWith("/data/toilets-live.json");
 
-  // Never let stale app HTML/config hide the latest GPS logic.
   if(isAppHtml || isRuntimeConfig || isLiveData){
     event.respondWith(
       fetch(event.request,{cache:"no-store"})
