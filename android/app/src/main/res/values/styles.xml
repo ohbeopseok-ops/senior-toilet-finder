@@ -1,0 +1,10 @@
+<resources>
+    <style name="Theme.AnshimToilet" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:statusBarColor">@color/brand_dark</item>
+        <item name="android:navigationBarColor">@color/brand_dark</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:colorAccent">@color/brand_yellow</item>
+    </style>
+</resources>
