@@ -1,8 +1,8 @@
 {
   "source": "anyang-public-restroom-seed",
   "region": "경기도 안양시",
-  "generatedAt": "2026-11-04T00:52:25.775030+00:00",
-  "syncStatus": "source-unavailable",
+  "generatedAt": "2026-11-05T01:02:16.423871+00:00",
+  "syncStatus": "geocode-pending",
   "officialRecordCount": 249,
   "usableCoordinateCount": 0,
   "items": [
@@ -2239,8 +2239,8 @@
       "sourceRegion": "안양시",
       "openCategory": "",
       "openHours": "10:00~19:00",
-      "isOpen": false,
-      "openStatus": "closed",
+      "isOpen": true,
+      "openStatus": "open",
       "openStatusVerified": false,
       "stairs": false,
       "stairsVerified": false,
@@ -5539,8 +5539,8 @@
       "sourceRegion": "안양시",
       "openCategory": "",
       "openHours": "10:00~19:00",
-      "isOpen": false,
-      "openStatus": "closed",
+      "isOpen": true,
+      "openStatus": "open",
       "openStatusVerified": false,
       "stairs": false,
       "stairsVerified": false,
@@ -7477,9 +7477,6 @@
       "closingSoon": false
     }
   ],
-  "openStatusComputedAt": "2026-11-04T09:52:26.005750+09:00",
-  "openStatusParsedCount": 249,
-  "sourceUrl": "https://file.localdata.go.kr/file/public_restroom_info/info",
-  "lastSyncAttemptAt": "2026-11-05T00:54:33.877984+00:00",
-  "syncError": "HTTP Error 403: Forbidden"
+  "openStatusComputedAt": "2026-11-05T10:02:16.625843+09:00",
+  "openStatusParsedCount": 249
 }
